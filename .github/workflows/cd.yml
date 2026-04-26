@@ -39,3 +39,19 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/yj-backend:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/yj-frontend:${{ github.sha }}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/yj-frontend:latest
+      - name: JDK 17 설정
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Backend Maven 빌드
+        run: |
+          cd backend
+          chmod +x mvnw
+          ./mvnw package -DskipTests
+
+# 그 다음 기존 Backend Docker Build 스텝
+      - name: Backend Docker Build
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/yj-backend:${{ github.sha }} ./backend
